@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # (optional) You might need to set your PATH variable at the top here
 # depending on how you run this script
