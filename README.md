@@ -4,18 +4,18 @@ Helpful scripts I've written for various reasons
 - aws-cf-compare-templates.sh
     + Downloads the CloudFormation template of STACKNAME and compares it to the contents of TEMPLATE, and the results are displayed in vimdiff (or diff if vimdiff not available).
 - aws-cf-create-stack.sh
-    + Creates CloudFormation stack STACKNAME in region(s) REGION[,REGION,...]using template TEMPLATE
+    + Creates CloudFormation stack STACKNAME in region(s) REGION[,REGION,...] using template TEMPLATE
 - aws-cf-delete-stack.sh
     + eletes CloudFormation stack STACKNAME from region(s) REGION[,REGION,...]
 - aws-cf-latest-update.sh
     + Returns the date of the most recent update to the CloudFormation template of STACKNAME (date is in UTC)
 - aws-cf-update-stack.sh
-    + Updates CloudFormation stack STACKNAME in region(s) REGION[,REGION,...]with template TEMPLATE
+    + Updates CloudFormation stack STACKNAME in region(s) REGION[,REGION,...] with template TEMPLATE
 - aws-cf-validate-cloudformation.sh
     + Performs a JSON syntax check on TEMPLATE(s), and if it passes uploads it to s3://\${bucket}/tmp/ and performs a CloudFormation validation on it.
         * Requires [jq](https://stedolan.github.io/jq/)
 - aws-ec2-terminate-instance.sh
-    + Deletes EC2 instance based on lookup of InstanceId or PublicDnsName, and deletes its rootDeviceName volume
+    + Deletes EC2 instance based on lookup of InstanceId or PublicDnsName and deletes its rootDeviceName volume
 - aws-ec2-volume-delete.sh
     + Deletes available EC2 volumes
 - aws-r53-dynamic-update.sh
