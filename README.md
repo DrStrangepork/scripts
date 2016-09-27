@@ -1,4 +1,4 @@
-# scripts
+# scripts [![Build Status](https://travis-ci.org/DrStrangepork/scripts.svg?branch=master)](https://travis-ci.org/DrStrangepork/scripts)
 Helpful scripts I've written for various reasons
 
 - aws-cf-compare-templates.sh
