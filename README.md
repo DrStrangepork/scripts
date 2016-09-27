@@ -14,6 +14,10 @@ Helpful scripts I've written for various reasons
 - aws-cf-validate-cloudformation.sh
     + Performs a JSON syntax check on TEMPLATE(s), and if it passes uploads it to s3://\${bucket}/tmp/ and performs a CloudFormation validation on it.
         * Requires [jq](https://stedolan.github.io/jq/)
+- aws-ec2-terminate-instance.sh
+    + Deletes EC2 instance based on lookup of InstanceId or PublicDnsName, and deletes its rootDeviceName volume
+- aws-ec2-volume-delete.sh
+    + Deletes available EC2 volumes
 - aws-r53-dynamic-update.sh
     + Use to automatically update a record set in AWS Route 53 whenever your IP changes (good for home-based domains that use DHCP (Verizon FIOS, Comcast, etc))
 - brew-cask-upgrade.sh
