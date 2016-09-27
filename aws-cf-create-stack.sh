@@ -13,9 +13,10 @@ Example:  $(basename ${BASH_SOURCE[0]}) -s svc-stack -r us-east-1,us-west2 -t sv
 Required: -s STACKNAME -t TEMPLATE
 Options:
   -s STACKNAME  name of stack
-  -t TEMPLATE   name of template (MUST end in \".json\")
+  -t TEMPLATE   name of template
   -p            AWS profile (default: AWS_DEFAULT_PROFILE or \"none\")
-  -r            comma-delimited list of regions (default: us-east-1; \"all\" = all)
+  -r            comma-delimited list of regions
+                  (default: AWS_DEFAULT_REGION or us-east-1; \"all\" = all)
   -h            help"
 }
 

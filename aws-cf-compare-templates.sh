@@ -56,15 +56,14 @@ while getopts ":cdp:r:s:t:uh" opt; do
         ;;
     p)  profile=$OPTARG
         ;;
-    r)  [ "${OPTARG,,}" == "all" ] && { regions=$AWSRegs; continue; }
-        unset regions
-        region=${OPTARG,,}  # ${OPTARG,,} converts $OPTARG to all lowercase letters
+    r)  region=${OPTARG,,}  # ${OPTARG,,} converts $OPTARG to all lowercase letters
+        FOUND=false
         for reg in $AWSRegs; do
-          [ "$reg" == "$region" ] && FOUND=1
+          [ "$reg" == "$region" ] && FOUND=true
         done
-        if [[ "$FOUND" -eq 0 ]]; then
+        if ! $FOUND; then
           echo "Error: invalid region - $reg" >&2
-          echo "Valid regions are: $AWSRegs" | fold -s
+          echo "Valid regions are: $AWSRegs" | fold -s >&2
           exit 1
         fi
         ;;

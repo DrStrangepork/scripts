@@ -13,7 +13,8 @@ Required: -s STACKNAME
 Options:
   -s STACKNAME  name of stack
   -p            AWS profile (default: AWS_DEFAULT_PROFILE or \"none\")
-  -r            comma-delimited list of regions (default: us-east-1; \"all\" = all)
+  -r            comma-delimited list of regions
+                  (default: AWS_DEFAULT_REGION or us-east-1; \"all\" = all)
   -h            help"
 }
 
