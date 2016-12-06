@@ -26,3 +26,11 @@ Helpful scripts I've written for various reasons
     + Updates brew and then upgrades any updated formulae and casks
 - compare-json.sh
     + Compares the contents of two JSON files, and the results are displayed in vimdiff (or diff if vimdiff not available).
+- nmap-report.sh
+    + Performs a port scan on a given target and saves an HTML report to ./nmap-report.html
+
+## Contributors
+Simple instructions for testing:
+1. `git clone` the repo
+2. `git submodule update --init --recursive`
+3. `./test.sh`
