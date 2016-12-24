@@ -31,6 +31,7 @@ Helpful scripts I've written for various reasons
 
 ## Contributors
 Simple instructions for testing:
+
 1. `git clone` the repo
 2. `git submodule update --init --recursive`
 3. `./test.sh`
