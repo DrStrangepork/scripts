@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 echo Executing \'brew cleanup\; brew cask cleanup\; brew update\'
 brew cleanup; brew cask cleanup; brew update

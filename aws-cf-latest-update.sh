@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 AWSRegs="ap-northeast-1 ap-southeast-1 ap-southeast-2 eu-central-1 eu-west-1 sa-east-1 us-east-1 us-west-1 us-east-1"
 profile=${AWS_DEFAULT_PROFILE:-none}
 region=${AWS_DEFAULT_REGION:-us-east-1}

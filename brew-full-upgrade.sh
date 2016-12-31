@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 brew cleanup; brew cask cleanup
 brew update
