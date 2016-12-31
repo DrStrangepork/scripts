@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 profile=${AWS_DEFAULT_PROFILE:-none}
 
 
