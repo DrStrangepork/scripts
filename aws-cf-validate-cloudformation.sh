@@ -36,7 +36,7 @@ fi
 [[ "$@" =~ "--help" ]] && { usage | less; exit; }
 while getopts ":b:p:t:h" opt; do
   case $opt in
-    b)  S3=${OPTARG,,}    # ${OPTARG,,} converts $OPTARG to all lowercase letters
+    b)  S3=$(echo "$OPTARG" | tr '[:upper:]' '[:lower:]')
         # S3 must be 's3://' followed by a [a-z0-9]
         if ! expr "$S3" : '\(s3://[a-z0-9]\)' >/dev/null; then
           echo "S3 bucket must begin with \"s3://\""
