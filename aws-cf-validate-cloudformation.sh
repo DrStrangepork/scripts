@@ -62,7 +62,7 @@ while getopts ":b:p:t:h" opt; do
         ;;
   esac
 done
-[[ -n "$STACKNAME" || -n "$TEMPLATES" ]] || { usage; exit 1; }
+[[ -z "$URL" || -z "$TEMPLATES" ]] && { usage; exit 1; }
 
 
 ## MAIN
