@@ -5,6 +5,7 @@ BLUE()  { tput bold; tput setaf 4; echo -e -n "$@"; tput sgr0; }
 WHITE() { tput bold; tput setaf 7; echo -e -n "$@"; tput sgr0; }
 ##### END COLORS
 
+echo "'brew cask fetch' has been commented out"
 brew cleanup; brew cask cleanup
 brew update
 brew upgrade
@@ -18,6 +19,6 @@ done
 BLUE "==> "; WHITE "Upgrading $(echo $pkgs | wc -w) outdated Casks, with result:\\n"
 echo $pkgs
 for pkg in $pkgs; do
-    brew cask fetch $pkg
+#    brew cask fetch $pkg
     brew cask install $pkg --force
 done
