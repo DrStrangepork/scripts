@@ -7,13 +7,11 @@ regions=${AWS_DEFAULT_REGION:-us-east-1}
 usage() {
   echo \
 "$(tput bold)$(basename ${BASH_SOURCE[0]})$(tput sgr0)
-Usage:  Updates CloudFormation stack STACKNAME in region(s) REGION[,REGION,...]
-        with template TEMPLATE
-Example:  $(basename ${BASH_SOURCE[0]}) -s svc-stack -r us-east-1,us-west2 -t svc.json
-Required: -s STACKNAME -t TEMPLATE
+Usage:  Queries CloudWatch for alarms of InstanceId dimensions, then queries
+        EC2 for the status of each InstanceId, and if it not in a running
+        state, all its CloudWatch alarms are deleted
+Example:  $(basename ${BASH_SOURCE[0]})
 Options:
-  -s STACKNAME  name of stack
-  -t TEMPLATE   name of template (MUST end in \".json\")
   -p            AWS profile (default: AWS_DEFAULT_PROFILE or \"none\")
   -r            comma-delimited list of regions
                   (default: AWS_DEFAULT_REGION or us-east-1; \"all\" = all)
@@ -34,7 +32,7 @@ fi
 
 
 [[ "$@" =~ "--help" ]] && { usage | less; exit; }
-while getopts ":p:r:s:t:h" opt; do
+while getopts ":p:r:h" opt; do
   case $opt in
     p)  profile=$OPTARG
         ;;
@@ -56,10 +54,6 @@ while getopts ":p:r:s:t:h" opt; do
           done
         done <<< "${OPTARG,,}"    # ${OPTARG,,} converts $OPTARG to all lowercase letters
         ;;
-    s)  STACKNAME=$OPTARG
-        ;;
-    t)  TEMPLATE=$OPTARG
-        ;;
     h)  usage ; exit
         ;;
     *)  echo "Error: invalid option -$OPTARG" >&2
@@ -71,11 +65,10 @@ done
 
 
 ## MAIN
-for reg in $regions; do
-  if ! aws --profile $profile --region $reg cloudformation describe-stacks --stack-name $STACKNAME >/dev/null 2>&1; then
-    echo "Error: Failed to retrieve stack $STACKNAME in region $region" >&2
-    exit 1
+for IID in $(aws --profile $profile --region $reg cloudwatch describe-alarms --query 'MetricAlarms[].Dimensions[?Name==`InstanceId`].Value' --output text | uniq); do
+  if ! aws --profile $profile --region $reg ec2 describe-instances --instance-ids $IID --filters Name=instance-state-name,Values=running >/dev/null 2>&1; then
+    for AlarmName in $(aws --profile $profile --region $reg cloudwatch describe-alarms --query 'MetricAlarms[?Dimensions[?Value==`'$IID'`]].AlarmName' --output text); do
+        aws --profile $profile --region $reg cloudwatch delete-alarms --alarm-names $AlarmName && echo Alarm $AlarmName deleted
+    done
   fi
-  echo aws --profile $profile --region $reg cloudformation update-stack --stack-name $STACKNAME --template-body file://$TEMPLATE --capabilities CAPABILITY_IAM
-  aws --profile $profile --region $reg cloudformation update-stack --stack-name $STACKNAME --template-body file://$TEMPLATE --capabilities CAPABILITY_IAM
 done
