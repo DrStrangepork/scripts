@@ -25,7 +25,7 @@ Options:
 
 prereq="Prerequisites are missing and must be installed before continuing:\n"
 missing_req=false
-if ! which aws >/dev/null 2>&1; then
+if ! aws --version >/dev/null 2>&1; then
   prereq+="\t'aws' python cli from http://aws.amazon.com/cli/\n"
   missing_req=true
 fi
@@ -35,8 +35,8 @@ if $missing_req; then
 fi
 
 
-[[ "$@" =~ "--help" ]] && { usage | less; exit; }
-while getopts ":d:qr:t:v:h" opt; do
+[[ "$*" =~ "--help" ]] && { usage | less; exit; }
+while getopts ":d:pqr:t:v:h" opt; do
   case $opt in
     d)  [ -n "$VIDs" ] && { usage; exit 1; }
         if [[ ! "$OPTARG" =~ 201[0-9]-[0-1][0-9]-[0-3][0-9] ]]; then

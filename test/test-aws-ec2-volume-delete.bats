@@ -62,7 +62,7 @@ scr='aws-ec2-volume-delete.sh'
 #
 # prereq="Prerequisites are missing and must be installed before continuing:\n"
 # missing_req=false
-# if ! which aws >/dev/null 2>&1; then
+# if ! aws --version >/dev/null 2>&1; then
 #   prereq+="\t'aws' python cli from http://aws.amazon.com/cli/\n"
 #   missing_req=true
 # fi
@@ -72,7 +72,7 @@ scr='aws-ec2-volume-delete.sh'
 # fi
 #
 #
-# [[ "$@" =~ "--help" ]] && { usage | less; exit; }
+# [[ "$*" =~ "--help" ]] && { usage | less; exit; }
 # while getopts ":d:qr:t:v:h" opt; do
 #   case $opt in
 #     d)  [ -n "$VIDs" ] && { usage; exit 1; }

@@ -33,7 +33,7 @@ if $missing_req; then
 fi
 
 
-[[ "$@" =~ "--help" ]] && { usage | less; exit; }
+[[ "$*" =~ "--help" ]] && { usage | less; exit; }
 while getopts ":cds:t:uh" opt; do
   case $opt in
     c)  CLEAN=true
@@ -45,7 +45,7 @@ while getopts ":cds:t:uh" opt; do
         if [[ ! -s $SOURCE ]]; then
           echo "Error: Missing file $SOURCE" >&2
           exit 1
-        elif ! cat $SOURCE | jq -S '' > $SRCtmp; then
+        elif ! jq -S '' $SOURCE > $SRCtmp; then
           echo "Error: $SOURCE failed json validation" >&2
           exit 1
         fi
@@ -55,7 +55,7 @@ while getopts ":cds:t:uh" opt; do
         if [[ ! -s $TARGET ]]; then
           echo "Error: Missing file $TARGET" >&2
           exit 1
-        elif ! cat $TARGET | jq -S '' > $TRGtmp; then
+        elif ! jq -S '' $TARGET > $TRGtmp; then
           echo "Error: $TARGET failed json validation" >&2
           exit 1
         fi
@@ -79,7 +79,7 @@ if ! diff $SRCtmp $TRGtmp >/dev/null; then
   else
     vimdiff $SRCtmp $TRGtmp
     if [ $UPDATE ]; then
-      if ! cat $SRCtmp | jq -S '' >/dev/null; then
+      if ! jq -S '' $SRCtmp >/dev/null; then
         echo "Error: $SRCtmp failed json validation" >&2
         exit 1
       elif ! diff $SRCtmp $SOURCE >/dev/null; then
@@ -91,7 +91,7 @@ if ! diff $SRCtmp $TRGtmp >/dev/null; then
       else
         echo "No updates made to $SRCtmp"
       fi
-      if ! cat $TRGtmp | jq -S '' >/dev/null; then
+      if ! jq -S '' $TRGtmp >/dev/null; then
         echo "Error: $TRGtmp failed json validation" >&2
         exit 1
       elif ! diff $TRGtmp $TARGET >/dev/null; then

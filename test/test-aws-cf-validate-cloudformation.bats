@@ -49,11 +49,11 @@ scr='aws-cf-validate-cloudformation.sh'
 #
 # prereq="Prerequisites are missing and must be installed before continuing:\n"
 # missing_req=false
-# if ! which aws >/dev/null 2>&1; then
+# if ! aws --version >/dev/null 2>&1; then
 #   prereq+="\t'aws' python cli from http://aws.amazon.com/cli/\n"
 #   missing_req=true
 # fi
-# if ! which jq >/dev/null 2>&1; then
+# if ! jq --version >/dev/null 2>&1; then
 #   prereq+="\t'jq' from 'yum install jq'\n"
 #   missing_req=true
 # fi
@@ -63,7 +63,7 @@ scr='aws-cf-validate-cloudformation.sh'
 # fi
 #
 #
-# [[ "$@" =~ "--help" ]] && { usage | less; exit; }
+# [[ "$*" =~ "--help" ]] && { usage | less; exit; }
 # while getopts ":b:p:t:h" opt; do
 #   case $opt in
 #     b)  S3=${OPTARG,,}    # ${OPTARG,,} converts $OPTARG to all lowercase letters

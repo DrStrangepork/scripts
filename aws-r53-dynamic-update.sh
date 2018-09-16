@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 profile=${AWS_DEFAULT_PROFILE:-none}
 IPPROVIDER=https://wtfismyip.com/text
-COMMENT="Auto updating @ `date`"
+COMMENT="Auto updating @ $(date)"
 IPFILE="$HOME/update-route53.ip"
 LOGFILE="$HOME/update-route53.log"
 TTL=300
@@ -51,7 +51,7 @@ Required: -r RECORDSET -z ZONEID
 Options:
   -r RECORDSET  FQDN of the host to check
   -z ZONEID     Hosted zone ID
-  -c COMMENT    Change comment (default: \"Auto updating @ `date`\")
+  -c COMMENT    Change comment (default: \"Auto updating @ $(date)\")
   -i IPPROVIDER URL of IP dection service (default: https://wtfismyip.com/text)
                     Ex. http://ifconfig.me/ip, https://icanhasip.com/
   -l LOGFILE    Output log (default: LOGFILE=\"~/update-route53.log\")
@@ -65,7 +65,7 @@ Options:
 
 prereq="Prerequisites are missing and must be installed before continuing:\n"
 missing_req=false
-if ! which aws >/dev/null 2>&1; then
+if ! aws --version >/dev/null 2>&1; then
   prereq+="\t'aws' python cli from http://aws.amazon.com/cli/\n"
   missing_req=true
 fi
@@ -75,7 +75,7 @@ if $missing_req; then
 fi
 
 
-[[ "$@" =~ "--help" ]] && { usage | less; exit; }
+[[ "$*" =~ "--help" ]] && { usage | less; exit; }
 while getopts ":c:i:l:p:r:s:t:vz:h" opt; do
   case $opt in
     c)  COMMENT=$OPTARG
@@ -111,7 +111,7 @@ done
 trap handle_err ERR
 
 # Get the external IP address
-IP=`curl -sS $IPPROVIDER`
+IP=$(curl -sS $IPPROVIDER)
 
 if ! valid_ip $IP; then
     echo "Invalid IP address: $IP" >> ${LOGFILE}

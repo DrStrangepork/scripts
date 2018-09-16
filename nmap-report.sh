@@ -16,11 +16,11 @@ Options:
 
 prereq="Prerequisites are missing and must be installed before continuing:\n"
 missing_req=false
-if ! which nmap >/dev/null 2>&1; then
+if ! nmap --version >/dev/null 2>&1; then
   prereq+="\tnmap\n"
   missing_req=true
 fi
-if ! which xsltproc >/dev/null 2>&1; then
+if ! xsltproc --version >/dev/null 2>&1; then
   prereq+="\tlibxslt\n"
   missing_req=true
 fi
@@ -30,7 +30,7 @@ if $missing_req; then
 fi
 
 
-[[ "$@" =~ "--help" ]] && { usage | less; exit; }
+[[ "$*" =~ "--help" ]] && { usage | less; exit; }
 while getopts ":p:r:s:t:h" opt; do
   case $opt in
     t)  TARGET=$OPTARG

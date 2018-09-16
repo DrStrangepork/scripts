@@ -66,7 +66,7 @@ scr='aws-cf-compare-templates.sh'
 #
 # prereq="Prerequisites are missing and must be installed before continuing:\n"
 # missing_req=false
-# if ! which python >/dev/null 2>&1; then
+# if ! python --version >/dev/null 2>&1; then
 #   prereq+="\t'python'\n"
 #   missing_req=true
 # fi
@@ -74,7 +74,7 @@ scr='aws-cf-compare-templates.sh'
 #   prereq+="\t'python json library'\n"
 #   missing_req=true
 # fi
-# if ! which aws >/dev/null 2>&1; then
+# if ! aws --version >/dev/null 2>&1; then
 #   prereq+="\t'aws' python cli from http://aws.amazon.com/cli/\n"
 #   missing_req=true
 # fi
@@ -84,7 +84,7 @@ scr='aws-cf-compare-templates.sh'
 # fi
 #
 #
-# [[ "$@" =~ "--help" ]] && { usage | less; exit; }
+# [[ "$*" =~ "--help" ]] && { usage | less; exit; }
 # while getopts ":cdp:r:s:t:uh" opt; do
 #   case $opt in
 #     c)  CLEAN=true
