@@ -106,7 +106,7 @@ scr='aws-cf-delete-stack.sh'
 # ## MAIN
 # for reg in $regions; do
 #   if ! aws --profile $profile --region $reg cloudformation describe-stacks --stack-name $STACKNAME >/dev/null 2>&1; then
-#     echo "Error: Failed to retrieve stack $STACKNAME in region $region" >&2
+#     echo "Error: Failed to retrieve stack $STACKNAME in region $reg" >&2
 #     exit 1
 #   fi
 #   echo aws --profile $profile --region $reg cloudformation delete-stack --stack-name $STACKNAME

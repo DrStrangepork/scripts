@@ -73,7 +73,7 @@ done
 ## MAIN
 for reg in $regions; do
   if aws --profile $profile --region $reg cloudformation describe-stacks --stack-name $STACKNAME >/dev/null 2>&1; then
-    echo "Error: Stack $STACKNAME already exists in region $region" >&2
+    echo "Error: Stack $STACKNAME already exists in region $reg" >&2
     exit 1
   fi
   echo aws --profile $profile --region $reg cloudformation create-stack --stack-name $STACKNAME --template-body file://$TEMPLATE --capabilities CAPABILITY_IAM
