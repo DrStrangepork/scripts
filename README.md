@@ -15,8 +15,9 @@ Helpful scripts I've written for various reasons
 - aws-cf-validate-cloudformation.sh
   - Performs a JSON syntax check on TEMPLATE(s), and if it passes uploads it to s3://\${bucket}/tmp/ and performs a CloudFormation validation on it.
     - Requires [jq](https://stedolan.github.io/jq/)
-- aws-cw-delete-alarms-for-non-running-instances.sh
-  - Queries CloudWatch for alarms of InstanceId dimensions, then queries EC2 for the status of each InstanceId, and if it not in a running state, all its CloudWatch alarms are deleted
+- aws-cw-alarms-with-missing-dimensions.py
+  - Reports and optionally deletes CloudWatch alarms that monitor non-existent resources
+  - Requires `boto3`: `pip install -r requirements.txt`
 - aws-ec2-terminate-instance.sh
   - Deletes EC2 instance based on lookup of InstanceId or PublicDnsName and deletes its rootDeviceName volume
 - aws-ec2-volume-delete.sh
