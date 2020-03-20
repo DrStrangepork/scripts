@@ -10,4 +10,8 @@ brew update
 brew upgrade
 
 packages="$(brew cask outdated --greedy --verbose | awk '$NF !~ /latest/ {print $1}')"
-[ -n "$packages" ] && brew cask reinstall $packages
+[ -n "$packages" ] && echo || exit 0
+
+BLUE "==> "; WHITE "Upgrading $(echo $packages | wc -w) outdated Casks, with result:\\n"
+echo $packages
+brew cask reinstall $packages
