@@ -27,6 +27,8 @@ Helpful scripts I've written for various reasons
   - Updates brew and then upgrades any updated formulae and casks
 - compare-json.sh
   - Compares the contents of two JSON files, and the results are displayed in vimdiff (or diff if vimdiff not available).
+- git-commit-dates.sh
+  - Resets the timestamps of all files in a git repo to their commit dates
 - nmap-report.sh
   - Performs a port scan on a given target and saves an HTML report to ./nmap-report.html
 
