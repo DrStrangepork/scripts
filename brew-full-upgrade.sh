@@ -35,7 +35,7 @@ brew cleanup
 brew update
 brew upgrade
 
-packages="$(brew cask outdated $GREEDY)"
+packages="$(brew outdated --cask $GREEDY)"
 [ -z "$packages" ] && { echo "No casks to upgrade"; exit 0; }
 BLUE "\n==> "; WHITE "Upgrading $(echo $packages | wc -w) outdated Casks, with result:\\n"
 echo $packages
