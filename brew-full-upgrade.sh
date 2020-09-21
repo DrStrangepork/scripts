@@ -11,7 +11,7 @@ usage() {
 "$(tput bold)$(basename ${BASH_SOURCE[0]})$(tput sgr0)
 Usage:  Upgrade all brew packages and casks
 Options:
-  -g            \`brew cask upgrade --greedy\`
+  -g            \`brew upgrade --cask --greedy\`
   -h            help"
 }
 
@@ -39,4 +39,4 @@ packages="$(brew outdated --cask $GREEDY)"
 [ -z "$packages" ] && { echo "No casks to upgrade"; exit 0; }
 BLUE "\n==> "; WHITE "Upgrading $(echo $packages | wc -w) outdated Casks, with result:\\n"
 echo $packages
-brew cask upgrade $GREEDY
+brew upgrade --cask $GREEDY
