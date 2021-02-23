@@ -45,7 +45,6 @@ if __name__ == "__main__":
                                 print("\"%s\": Instance %s not found" % (alarm['AlarmName'], dimension['Value']))
                         else:
                             print(e)
-                        pass
                     break
                 elif dimension['Name'] == 'AutoScalingGroupName':
                     try:
@@ -60,7 +59,6 @@ if __name__ == "__main__":
                     except ClientError as e:
                         print(e)
                         print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-                        pass
                 elif dimension['Name'] == 'LoadBalancerName':
                     try:
                         client = boto3.client('elb')
@@ -72,9 +70,15 @@ if __name__ == "__main__":
                             else:
                                 print("\"%s\": LoadBalancer %s not found" % (alarm['AlarmName'], dimension['Value']))
                     except ClientError as e:
-                        print(e)
-                        print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-                        pass
+                        if 'LoadBalancerNotFound' in str(e):
+                            if args.delete:
+                                cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                                print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                            else:
+                                print("\"%s\": DBInstance %s not found" % (alarm['AlarmName'], dimension['Value']))
+                        else:
+                            print(e)
+                            print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
                 elif dimension['Name'] == 'LoadBalancer':
                     dimension['Value'] = re.split(r'/', dimension['Value'])[1]
                     try:
@@ -87,9 +91,15 @@ if __name__ == "__main__":
                             else:
                                 print("\"%s\": LoadBalancer %s not found" % (alarm['AlarmName'], dimension['Value']))
                     except ClientError as e:
-                        print(e)
-                        print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-                        pass
+                        if 'LoadBalancerNotFound' in str(e):
+                            if args.delete:
+                                cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                                print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                            else:
+                                print("\"%s\": DBInstance %s not found" % (alarm['AlarmName'], dimension['Value']))
+                        else:
+                            print(e)
+                            print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
                 elif dimension['Name'] == 'DBInstanceIdentifier':
                     try:
                         client = boto3.client('rds')
@@ -101,9 +111,15 @@ if __name__ == "__main__":
                             else:
                                 print("\"%s\": DBInstance %s not found" % (alarm['AlarmName'], dimension['Value']))
                     except ClientError as e:
-                        print(e)
-                        print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-                        pass
+                        if 'DBInstanceNotFound' in str(e):
+                            if args.delete:
+                                cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                                print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                            else:
+                                print("\"%s\": DBInstance %s not found" % (alarm['AlarmName'], dimension['Value']))
+                        else:
+                            print(e)
+                            print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
                 elif dimension['Name'] == 'TableName':
                     try:
                         client = boto3.client('dynamodb')
@@ -117,6 +133,5 @@ if __name__ == "__main__":
                     except ClientError as e:
                         print(e)
                         print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-                        pass
                 elif args.verbose:
-                    print("** UNHANDLED RESOURCE ** \"%s\": %s" % (alarm['AlarmName'], str(dimension)))
+                        print("** UNHANDLED RESOURCE ** \"%s\": %s" % (alarm['AlarmName'], str(dimension)))
