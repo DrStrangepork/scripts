@@ -28,6 +28,13 @@ if __name__ == "__main__":
     paginator = cloudwatch.get_paginator('describe_alarms')
     for response in paginator.paginate():
         for alarm in response['MetricAlarms']:
+            if not alarm['Dimensions']:
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": Empty dimensions" % alarm['AlarmName'])
+                break
             for dimension in alarm['Dimensions']:
                 if dimension['Name'] in ("MountPath", "Filesystem"):
                     # Filesystem checks have multiple keys, skip all but InstanceId
