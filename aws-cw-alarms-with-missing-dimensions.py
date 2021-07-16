@@ -10,9 +10,118 @@ class Debug(argparse.Action):
         import pdb; pdb.set_trace()
 
 
-# MAIN
+def parse_dimensions(dimension):
+    if dimension['Name'] in ("MountPath", "Filesystem"):
+        # Filesystem checks have multiple keys, skip all but InstanceId
+        pass
+    elif dimension['Name'] == 'InstanceId':
+        try:
+            client = boto3.client('ec2')
+            result = client.describe_instances(InstanceIds=[dimension['Value']])
+        except ClientError as e:
+            if 'InvalidInstanceID.NotFound' in str(e):
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": Instance '%s' not found" % (alarm['AlarmName'], dimension['Value']))
+            else:
+                print("InstanceId error '%s'" % (e))
+                print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
+    elif dimension['Name'] == 'AutoScalingGroupName':
+        try:
+            client = boto3.client('autoscaling')
+            result = client.describe_auto_scaling_groups(AutoScalingGroupNames=[dimension['Value']])
+            if not result['AutoScalingGroups']:
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": AutoScalingGroup '%s' not found" % (alarm['AlarmName'], dimension['Value']))
+        except ClientError as e:
+            print("AutoScalingGroupName error '%s'" % (e))
+            print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
+    elif dimension['Name'] == 'LoadBalancerName':
+        try:
+            client = boto3.client('elb')
+            result = client.describe_load_balancers(LoadBalancerNames=[dimension['Value']])
+            if not result['LoadBalancerDescriptions']:
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": Classic LoadBalancer '%s' not found" % (alarm['AlarmName'], dimension['Value']))
+        except ClientError as e:
+            if 'LoadBalancerNotFound' in str(e):
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": DBInstance '%s' not found" % (alarm['AlarmName'], dimension['Value']))
+            else:
+                print("Classic LoadBalancer error '%s'" % (e))
+                print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
+    elif dimension['Name'] == 'LoadBalancer':
+        if re.search('/', dimension['Value']):
+            dimension['Value'] = re.split(r'/', dimension['Value'])[1]
+        try:
+            client = boto3.client('elbv2')
+            result = client.describe_load_balancers(Names=[dimension['Value']])
+            if not result['LoadBalancers']:
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": ELBv2 LoadBalancer '%s' not found" % (alarm['AlarmName'], dimension['Value']))
+        except ClientError as e:
+            if 'LoadBalancerNotFound' in str(e):
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": DBInstance '%s' not found" % (alarm['AlarmName'], dimension['Value']))
+            else:
+                print("ELBv2 LoadBalancer error '%s'" % (e))
+                print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
+    elif dimension['Name'] == 'DBInstanceIdentifier':
+        try:
+            client = boto3.client('rds')
+            result = client.describe_db_instances(DBInstanceIdentifier=dimension['Value'])
+            if not result['DBInstances']:
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": DBInstance '%s' not found" % (alarm['AlarmName'], dimension['Value']))
+        except ClientError as e:
+            if 'DBInstanceNotFound' in str(e):
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": DBInstance '%s' not found" % (alarm['AlarmName'], dimension['Value']))
+            else:
+                print("DBInstanceIdentifier error '%s'" % (e))
+                print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
+    elif dimension['Name'] == 'TableName':
+        try:
+            client = boto3.client('dynamodb')
+            result = client.describe_table(TableName=dimension['Value'])
+            if not result['Table']:
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+                else:
+                    print("\"%s\": Table '%s' not found" % (alarm['AlarmName'], dimension['Value']))
+        except ClientError as e:
+            print("TableName error '%s'" % (e))
+            print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
+    elif args.verbose:
+            print("** UNHANDLED RESOURCE ** \"%s\": %s" % (alarm['AlarmName'], str(dimension)))
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="CloudWatch Alarm Auditing")
+    parser = argparse.ArgumentParser(description='CloudWatch Alarm Auditing')
     parser.add_argument('-d', '--delete',
                         action='store_true',
                         help='Delete alarms with missing dimensions')
@@ -29,114 +138,17 @@ if __name__ == "__main__":
     response = paginator.paginate().build_full_result()
     for alarm in response['MetricAlarms']:
         if not alarm['Dimensions']:
-            if args.delete:
-                cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
+            if 'Metrics' in alarm:
+                for metric in alarm['Metrics']:
+                    if 'MetricStat' in metric and metric['MetricStat']['Metric']['Dimensions']:
+                        print("\"%s\": Empty dimensions with MetricStat metrics, state is %s" % (alarm['AlarmName'], alarm['StateValue']))
+                        break
             else:
-                print("\"%s\": Empty dimensions" % alarm['AlarmName'])
-        for dimension in alarm['Dimensions']:
-            if dimension['Name'] in ("MountPath", "Filesystem"):
-                # Filesystem checks have multiple keys, skip all but InstanceId
-                pass
-            elif dimension['Name'] == 'InstanceId':
-                try:
-                    client = boto3.client('ec2')
-                    result = client.describe_instances(InstanceIds=[dimension['Value']])
-                except ClientError as e:
-                    if 'InvalidInstanceID.NotFound' in str(e):
-                        if args.delete:
-                            cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                            print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
-                        else:
-                            print("\"%s\": Instance %s not found" % (alarm['AlarmName'], dimension['Value']))
-                    else:
-                        print(e)
-            elif dimension['Name'] == 'AutoScalingGroupName':
-                try:
-                    client = boto3.client('autoscaling')
-                    result = client.describe_auto_scaling_groups(AutoScalingGroupNames=[dimension['Value']])
-                    if not result['AutoScalingGroups']:
-                        if args.delete:
-                            cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                            print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
-                        else:
-                            print("\"%s\": AutoScalingGroup %s not found" % (alarm['AlarmName'], dimension['Value']))
-                except ClientError as e:
-                    print(e)
-                    print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-            elif dimension['Name'] == 'LoadBalancerName':
-                try:
-                    client = boto3.client('elb')
-                    result = client.describe_load_balancers(LoadBalancerNames=[dimension['Value']])
-                    if not result['LoadBalancerDescriptions']:
-                        if args.delete:
-                            cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                            print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
-                        else:
-                            print("\"%s\": LoadBalancer %s not found" % (alarm['AlarmName'], dimension['Value']))
-                except ClientError as e:
-                    if 'LoadBalancerNotFound' in str(e):
-                        if args.delete:
-                            cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                            print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
-                        else:
-                            print("\"%s\": DBInstance %s not found" % (alarm['AlarmName'], dimension['Value']))
-                    else:
-                        print(e)
-                        print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-            elif dimension['Name'] == 'LoadBalancer':
-                dimension['Value'] = re.split(r'/', dimension['Value'])[1]
-                try:
-                    client = boto3.client('elbv2')
-                    result = client.describe_load_balancers(Names=[dimension['Value']])
-                    if not result['LoadBalancers']:
-                        if args.delete:
-                            cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                            print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
-                        else:
-                            print("\"%s\": LoadBalancer %s not found" % (alarm['AlarmName'], dimension['Value']))
-                except ClientError as e:
-                    if 'LoadBalancerNotFound' in str(e):
-                        if args.delete:
-                            cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                            print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
-                        else:
-                            print("\"%s\": DBInstance %s not found" % (alarm['AlarmName'], dimension['Value']))
-                    else:
-                        print(e)
-                        print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-            elif dimension['Name'] == 'DBInstanceIdentifier':
-                try:
-                    client = boto3.client('rds')
-                    result = client.describe_db_instances(DBInstanceIdentifier=dimension['Value'])
-                    if not result['DBInstances']:
-                        if args.delete:
-                            cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                            print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
-                        else:
-                            print("\"%s\": DBInstance %s not found" % (alarm['AlarmName'], dimension['Value']))
-                except ClientError as e:
-                    if 'DBInstanceNotFound' in str(e):
-                        if args.delete:
-                            cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                            print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
-                        else:
-                            print("\"%s\": DBInstance %s not found" % (alarm['AlarmName'], dimension['Value']))
-                    else:
-                        print(e)
-                        print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-            elif dimension['Name'] == 'TableName':
-                try:
-                    client = boto3.client('dynamodb')
-                    result = client.describe_table(TableName=dimension['Value'])
-                    if not result['Table']:
-                        if args.delete:
-                            cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
-                            print("AlarmName \"%s\" deleted" % alarm['AlarmName'])
-                        else:
-                            print("\"%s\": Table %s not found" % (alarm['AlarmName'], dimension['Value']))
-                except ClientError as e:
-                    print(e)
-                    print("%s: %s" % (alarm['AlarmName'], dimension['Value']))
-            elif args.verbose:
-                    print("** UNHANDLED RESOURCE ** \"%s\": %s" % (alarm['AlarmName'], str(dimension)))
+                if args.delete:
+                    cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
+                    print("AlarmName \"%s\" deleted, state was %s" % (alarm['AlarmName'], alarm['StateValue']))
+                else:
+                    print("\"%s\": Empty dimensions, state is %s" % (alarm['AlarmName'], alarm['StateValue']))
+        else:
+            for dimension in alarm['Dimensions']:
+                parse_dimensions(dimension)
