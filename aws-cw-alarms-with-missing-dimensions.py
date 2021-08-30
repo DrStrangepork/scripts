@@ -137,12 +137,19 @@ if __name__ == "__main__":
     paginator = cloudwatch.get_paginator('describe_alarms')
     response = paginator.paginate().build_full_result()
     for alarm in response['MetricAlarms']:
+        if 'Namespace' in alarm.keys():  # "InternetAvailability"
+            # Skip Namespace checks
+            break
         if not alarm['Dimensions']:
             if 'Metrics' in alarm:
                 for metric in alarm['Metrics']:
-                    if 'MetricStat' in metric and metric['MetricStat']['Metric']['Dimensions']:
-                        print("\"%s\": Empty dimensions with MetricStat metrics, state is %s" % (alarm['AlarmName'], alarm['StateValue']))
-                        break
+                    if 'MetricStat' in metric:
+                        if not metric['MetricStat']['Metric']['Dimensions']:
+                            print("\"%s\": Empty dimensions with MetricStat metrics, state is %s" % (alarm['AlarmName'], alarm['StateValue']))
+                            break
+                        else:
+                            for dimension in metric['MetricStat']['Metric']['Dimensions']:
+                                parse_dimensions(dimension)
             else:
                 if args.delete:
                     cloudwatch.delete_alarms(AlarmNames=[alarm['AlarmName']])
