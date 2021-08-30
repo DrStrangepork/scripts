@@ -137,9 +137,9 @@ if __name__ == "__main__":
     paginator = cloudwatch.get_paginator('describe_alarms')
     response = paginator.paginate().build_full_result()
     for alarm in response['MetricAlarms']:
-        if 'Namespace' in alarm.keys():  # "InternetAvailability"
+        if 'Namespace' in alarm.keys() and alarm['Namespace'] == 'InternetAvailability':
             # Skip Namespace checks
-            break
+            continue
         if not alarm['Dimensions']:
             if 'Metrics' in alarm:
                 for metric in alarm['Metrics']:
