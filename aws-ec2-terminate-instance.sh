@@ -106,8 +106,7 @@ for reg in $regions; do
   for IID in $IIDs; do
     # Disable termination protection
     if $FORCE; then
-      aws --profile $profile --region $reg ec2 modify-instance-attribute --instance-id $IID --no-disable-api-termination
-      if [ "$?" -ne "0" ]; then
+      if ! aws --profile $profile --region $reg ec2 modify-instance-attribute --instance-id $IID --no-disable-api-termination; then
         echo " ** Failed to disable termination protection - $IID" >&2
         exit 1
       fi
@@ -115,8 +114,7 @@ for reg in $regions; do
 
     # Set "RootDeviceName" to "DeleteOnTermination"=="true"
     rootDN=$(aws --profile $profile --region $reg ec2 describe-instance-attribute --instance-id $IID --attribute rootDeviceName --query "RootDeviceName.Value" --output text)
-    aws --profile $profile --region $reg ec2 modify-instance-attribute --instance-id $IID --block-device-mappings "[{\"DeviceName\":\"${rootDN}\",\"Ebs\":{\"DeleteOnTermination\":true}}]"
-    if [ "$?" -ne "0" ]; then
+    if ! aws --profile $profile --region $reg ec2 modify-instance-attribute --instance-id $IID --block-device-mappings "[{\"DeviceName\":\"${rootDN}\",\"Ebs\":{\"DeleteOnTermination\":true}}]"; then
       echo " ** Failed to set \"DeviceName\": \"${rootDN}\" to \"DeleteOnTermination\":true  - $IID" >&2
       exit 1
     fi

@@ -60,7 +60,7 @@ done
 
 
 ## MAIN
-if ! event="$(IFS="\n" && \
+if ! event="$(IFS=$'\n' && \
     aws --profile $profile --region $region cloudformation describe-stack-events --stack-name $STACKNAME \
     --query='StackEvents[?ResourceType==`AWS::CloudFormation::Stack` && (ResourceStatus==`CREATE_COMPLETE` || ResourceStatus==`UPDATE_COMPLETE`)] | [].[ResourceStatus,Timestamp]' \
     --max-items 1 --output text 2>/dev/null)"; then
