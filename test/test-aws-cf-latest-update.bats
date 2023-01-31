@@ -78,7 +78,7 @@ scr='aws-cf-latest-update.sh'
 #         for reg in $AWSRegs; do
 #           [ "$reg" == "$region" ] && FOUND=true
 #         done
-#         if ! $FOUND; then
+#         if [ ! $FOUND ]; then
 #           echo "Error: invalid region - $reg" >&2
 #           echo "Valid regions are: $AWSRegs" | fold -s >&2
 #           exit 1

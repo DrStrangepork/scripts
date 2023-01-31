@@ -80,7 +80,7 @@ while getopts ":d:fi:p:r:h" opt; do
             for reg in $AWSRegs; do
               [ "$reg" == "$i" ] && FOUND=true
             done
-            if $FOUND; then
+            if [ $FOUND ]; then
                 regions+="$i "
             else
               echo "Error: invalid region - $i" >&2

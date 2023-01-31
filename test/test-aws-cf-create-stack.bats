@@ -83,7 +83,7 @@ scr='aws-cf-create-stack.sh'
 #             for reg in $AWSRegs; do
 #               [ "$reg" == "$i" ] && FOUND=true
 #             done
-#             if $FOUND; then
+#             if [ $FOUND ]; then
 #                 regions+="$i "
 #             else
 #               echo "Error: invalid region - $i" >&2

@@ -61,7 +61,7 @@ while getopts ":cdp:r:s:t:uh" opt; do
         for reg in $AWSRegs; do
           [ "$reg" == "$region" ] && FOUND=true
         done
-        if ! $FOUND; then
+        if [ ! $FOUND ]; then
           echo "Error: invalid region - $reg" >&2
           echo "Valid regions are: $AWSRegs" | fold -s >&2
           exit 1
@@ -101,7 +101,7 @@ done
 
 ## MAIN
 if ! diff $STKtmp $TRGtmp >/dev/null; then
-  if $DIFF -o [[ ! -x /usr/bin/vimdiff ]]; then
+  if [[ $DIFF || ! -x /usr/bin/vimdiff ]]; then
     diff $STKtmp $TRGtmp
   else
     vimdiff $STKtmp $TRGtmp
