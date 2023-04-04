@@ -29,6 +29,8 @@ Helpful scripts I've written for various reasons
   - Retired as `brew` now does natively everything this script managed
 - compare-json.sh
   - Compares the contents of two JSON files, and the results are displayed in vimdiff (or diff if vimdiff not available).
+- decode.py
+  - URL decodes expired AWS console URLs (URLs reformatted after logout)
 - git-commit-dates.sh
   - Resets the timestamps of all files in a git repo to their commit dates
 - nmap-report.sh
