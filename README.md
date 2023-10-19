@@ -35,6 +35,8 @@ Helpful scripts I've written for various reasons
   - Resets the timestamps of all files in a git repo to their commit dates
 - nmap-report.sh
   - Performs a port scan on a given target and saves an HTML report to ./nmap-report.html
+- awscp.py
+  - Copies a source AWS credentials profile to a target profile of a different name
 
 ## Contributors
 
